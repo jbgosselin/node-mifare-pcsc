@@ -1,0 +1,29 @@
+{
+    "name": "mifare-pcsc",
+    "version": "0.0.1",
+    "description": "Use mifare 1K card",
+    "main": "index.js",
+    "dependencies": {
+	"pcsclite": "*"
+    },
+    "scripts": {
+	"test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+	"type": "git",
+	"url": "git://github.com/gossel-j/node-mifare-pcsc.git"
+    },
+    "keywords": [
+	"mifare",
+	"pcsc",
+	"pcsclite",
+	"nfc",
+	"rfid"
+    ],
+    "author": "dennajort",
+    "license": "MIT",
+    "bugs": {
+	"url": "https://github.com/gossel-j/node-mifare-pcsc/issues"
+    },
+    "homepage": "https://github.com/gossel-j/node-mifare-pcsc"
+}
