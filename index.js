@@ -159,7 +159,7 @@ Card.prototype.updateBlock = function(block, data, cb) {
     this.reader.transmit(buff, 2, this.protocol, standardCallback(cb));
 };
 
-Card.prototype.restoreBlock = function(src, dest, db) {
+Card.prototype.restoreBlock = function(src, dest, cb) {
     if (src < 0 || src > 0x3F)
 	throw new Error("Source block out of range");
     if (dest < 0 || dest > 0x3F)
