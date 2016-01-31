@@ -2,7 +2,10 @@
   "name": "mifare-pcsc",
   "version": "0.0.2",
   "description": "Use mifare 1K card",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "scripts": {
+    "prepublish" : "gulp prepublish"
+  },
   "dependencies": {
     "pcsclite": "0.4.8"
   },
@@ -23,8 +26,11 @@
     "url": "https://github.com/gossel-j/node-mifare-pcsc/issues"
   },
   "homepage": "https://github.com/gossel-j/node-mifare-pcsc",
-  "eslintConfig": {},
   "devDependencies": {
-    "eslint": "^1.10.3"
+    "babel-core": "^6.4.5",
+    "babel-preset-es2015": "^6.3.13",
+    "eslint": "^1.10.3",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^6.1.2"
   }
 }
