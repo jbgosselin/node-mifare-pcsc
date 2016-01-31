@@ -1,3 +1,4 @@
+"use strict";
 /*
   License: MIT
   Author: Gosselin Jean-Baptiste
