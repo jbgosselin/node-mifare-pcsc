@@ -4,7 +4,7 @@
   "description": "Use mifare 1K card",
   "main": "lib/index.js",
   "scripts": {
-    "prepublish" : "gulp prepublish"
+    "prepublish": "gulp prepublish"
   },
   "dependencies": {
     "pcsclite": "0.4.8"
