@@ -1,19 +1,15 @@
 "use strict";
-/*
-  License: MIT
-  Author: Gosselin Jean-Baptiste
-  email: gosselinjb@gmail.com
-*/
-import pcsclite from "pcsclite";
-import Card     from './Card';
+
+const pcsclite = require("pcsclite");
+const Card = require('./Card');
 
 let PCSC = null;
 
 const getPCSC = () => PCSC = PCSC || pcsclite();
 
-export const onCard = (cb, debug = false) => {
+const onCard = (cb, debug = false) => {
   const pcsc = getPCSC();
-  const log = (debug) ? console.log : (() => {;});
+  const log = (debug) ? console.log : () => {};
 
   pcsc.on("reader", (reader) => {
     log(`New Reader(${ reader.name })`);
@@ -22,7 +18,7 @@ export const onCard = (cb, debug = false) => {
       const changes = reader.state ^ status.state;
 
       if (changes) {
-        if ((changes & reader.SCARD_STATE_EMPTY) && (status.state & reader.SCARD_STATE_EMPTY)) {
+        if (changes & status.state & reader.SCARD_STATE_EMPTY) {
           log(`Reader(${ reader.name }) card removed`);
           reader.disconnect(reader.SCARD_LEAVE_CARD, (err) => {
             if (err) {
@@ -31,10 +27,10 @@ export const onCard = (cb, debug = false) => {
               log(`Reader(${ reader.name }) card disconnected`);
             }
           });
-        } else if ((changes & reader.SCARD_STATE_PRESENT) && (status.state & reader.SCARD_STATE_PRESENT)) {
+        } else if (changes & status.state & reader.SCARD_STATE_PRESENT) {
           log(`Reader(${ reader.name }) card inserted`);
           setTimeout(() => {
-            reader.connect({ share_mode : reader.SCARD_SHARE_SHARED }, (err, protocol) => {
+            reader.connect({ share_mode: reader.SCARD_SHARE_SHARED }, (err, protocol) => {
               if (err) {
                 log(`Reader(${ reader.name }) error on connect ${ err }`);
               } else {
@@ -54,7 +50,7 @@ export const onCard = (cb, debug = false) => {
   pcsc.on("error", (err) => log(`PCSC error: ${ err.message }`));
 };
 
-import {
+const {
   KEY_TYPE_A,
   KEY_TYPE_B,
   DEFAULT_KEY,
@@ -63,9 +59,10 @@ import {
   DEFAULT_C2,
   DEFAULT_C3,
   DEFAULT_END_ACS,
-} from "./common";
+} = require("./common");
 
-export {
+module.exports = {
+  onCard,
   Card,
   KEY_TYPE_A,
   KEY_TYPE_B,
