@@ -1,6 +1,6 @@
 {
   "name": "mifare-pcsc",
-  "version": "0.0.3-beta.1",
+  "version": "0.0.3",
   "description": "Use mifare 1K card",
   "main": "lib/index.js",
   "scripts": {
@@ -30,7 +30,9 @@
     "babel-core": "^6.4.5",
     "babel-preset-es2015": "^6.3.13",
     "eslint": "^1.10.3",
+    "eslint-config-dennajort": "^0.2.0",
     "gulp": "^3.9.0",
-    "gulp-babel": "^6.1.2"
+    "gulp-babel": "^6.1.2",
+    "run-sequence": "^1.1.5"
   }
 }
