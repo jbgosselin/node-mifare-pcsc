@@ -1,6 +1,6 @@
 {
   "name": "mifare-pcsc",
-  "version": "0.0.3-beta.1",
+  "version": "0.0.3",
   "description": "Use mifare 1K card",
   "main": "lib/index.js",
   "scripts": {
