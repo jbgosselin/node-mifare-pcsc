@@ -1,11 +1,11 @@
 'use strict';
 
-import {
+const {
   byteFromTwoHex,
   DEFAULT_END_ACS,
   KEY_TYPE_A,
   KEY_TYPE_B,
-} from "./common";
+} = require("./common");
 
 const standardCallback = (cb) => (err, data) => {
   if (err) return cb(err);
@@ -37,7 +37,7 @@ const readCallback = (cb) => (err, data) => {
   }
 };
 
-export default class Card {
+module.exports = class Card {
   constructor(reader, protocol) {
     this.reader = reader;
     this.protocol = protocol;
@@ -101,18 +101,26 @@ export default class Card {
     if (type !== KEY_TYPE_A && type !== KEY_TYPE_B) throw new Error("Wrong key type");
     if (block < 0 || block > 0x3F) throw new Error("Block out of range");
     if (key < 0 || key > 0x20) throw new Error("Key Number out of range");
-    this.reader.transmit(new Buffer([0xFF, 0x86, 0, 0, 5, 1, 0, block, type, key]), 2, this.protocol, standardCallback(cb));
+    this.reader.transmit(
+      new Buffer([0xFF, 0x86, 0, 0, 5, 1, 0, block, type, key]),
+      2, this.protocol, standardCallback(cb)
+    );
   }
 
   readBlock(block, length, cb) {
     if (block < 0 || block > 0x3F) throw new Error("Block out of range");
     if (length !== 0x10 && length !== 0x20 && length !== 0x30) throw new Error("Bad length");
-    this.reader.transmit(new Buffer([0xFF, 0xB0, 0, block, length]), length + 2, this.protocol, readCallback(cb));
+    this.reader.transmit(
+      new Buffer([0xFF, 0xB0, 0, block, length]),
+      length + 2, this.protocol, readCallback(cb)
+    );
   }
 
   updateBlock(block, data, cb) {
     if (block < 0 || block > 0x3F) throw new Error("Block out of range");
-    if (data.length !== 0x10 && data.length !== 0x20 && data.length !== 0x30) throw new Error("Bad length");
+    if (data.length !== 0x10 && data.length !== 0x20 && data.length !== 0x30) {
+      throw new Error("Bad length");
+    }
     const buff = Buffer.concat([
       new Buffer([0xFF, 0xD6, 0, block, data.length]),
       new Buffer(data),
@@ -124,6 +132,9 @@ export default class Card {
     if (src < 0 || src > 0x3F) throw new Error("Source block out of range");
     if (dest < 0 || dest > 0x3F) throw new Error("Destination block out of range");
     if (((src / 4) | 0) !== ((dest / 4) | 0)) throw new Error("Blocks are not in the same sector");
-    this.reader.transmit(new Buffer([0xFF, 0xD7, 0, src, 2, 3, dest]), 2, this.protocol, standardCallback(cb));
+    this.reader.transmit(
+      new Buffer([0xFF, 0xD7, 0, src, 2, 3, dest]),
+      2, this.protocol, standardCallback(cb)
+    );
   }
-}
+};
