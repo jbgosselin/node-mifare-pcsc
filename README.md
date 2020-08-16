@@ -1,10 +1,34 @@
 node-mifare-pcsc
 ================
 
-Use mifare 1K card with node-pcsclite
+Simple pcsclite wrapper for mifare 1K card.
 
-fixes
-  * Can use windows 8.1 (Use ACR122U, thanks to [hotamy](https://github.com/hotamy))
+Works with promises and provides an easy to use wrapper to communicate with Mifate 1K tags.
 
-## Dependencies
-  * [node-pcsclite 0.4.8](https://github.com/santigimeno/node-pcsclite) .Starting with version > 0.4.0 it works in Linux, OS X and Windows.
+Installation
+------------
+
+Under the hood it is using [node-pcsclite](https://github.com/santigimeno/node-pcsclite), you can follow installation instructions from there.
+
+Example
+-------
+
+```javascript
+const mifare = require('mifare-pcsc');
+
+(async () => {
+  const ctx = mifare();
+
+  while (true) {
+      console.log('Waiting for a card...');
+    const card = await ctx.waitForCard();
+    try {
+      const uid = await card.getUID();
+      console.log('UID', uid);
+    } catch (err) {
+      console.log('Error on getUID', err);
+    }
+    await card.disconnect();
+  }
+})();
+```

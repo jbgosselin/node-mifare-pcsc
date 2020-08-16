@@ -1,11 +1,22 @@
-var mifare = require("../lib");
+/* eslint-disable no-constant-condition */
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-console */
+const mifare = require('../src');
 
-mifare.onCard(function(card) {
-  card.getUID(function(err, uid) {
-    if (err) {
-      console.log("Error on getUID: %s", err);
-    } else {
-      console.log("getUID:", uid);
+(async () => {
+  const ctx = mifare();
+
+  while (true) {
+    console.log('before got card');
+    const card = await ctx.waitForCard();
+    console.log('got card');
+    try {
+      const uid = await card.getUID();
+      console.log('getUID', uid);
+    } catch (err) {
+      console.log('Error on getUID', err);
     }
-  });
-}, true);
+    await card.disconnect();
+    console.log('after disconnected');
+  }
+})();

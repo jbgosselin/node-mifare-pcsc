@@ -1,6 +1,0 @@
-{
-  "extends": "dennajort/base",
-  "rules": {
-    "no-console": 0
-  }
-}

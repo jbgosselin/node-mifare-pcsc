@@ -1,17 +1,17 @@
 {
   "name": "mifare-pcsc",
-  "version": "0.0.3",
-  "description": "Use mifare 1K card",
-  "main": "lib/index.js",
-  "scripts": {
-    "prepublish": "gulp prepublish"
+  "version": "1.0.0",
+  "description": "Simple pcsclite wrapper for mifare 1K card",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=10.0.0"
   },
   "dependencies": {
-    "pcsclite": "0.4.8"
+    "pcsclite": "^1.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/gossel-j/node-mifare-pcsc.git"
+    "url": "git://github.com/dennajort/node-mifare-pcsc.git"
   },
   "keywords": [
     "mifare",
@@ -23,16 +23,12 @@
   "author": "dennajort",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/gossel-j/node-mifare-pcsc/issues"
+    "url": "https://github.com/dennajort/node-mifare-pcsc/issues"
   },
-  "homepage": "https://github.com/gossel-j/node-mifare-pcsc",
+  "homepage": "https://github.com/dennajort/node-mifare-pcsc",
   "devDependencies": {
-    "babel-core": "^6.4.5",
-    "babel-preset-es2015": "^6.3.13",
-    "eslint": "^1.10.3",
-    "eslint-config-dennajort": "^0.2.0",
-    "gulp": "^3.9.0",
-    "gulp-babel": "^6.1.2",
-    "run-sequence": "^1.1.5"
+    "eslint": "^7.7.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0"
   }
 }
