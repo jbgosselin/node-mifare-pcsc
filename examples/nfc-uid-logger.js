@@ -1,7 +1,7 @@
 /* eslint-disable no-constant-condition */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-console */
-const mifare = require('../src');
+const mifare = require('../lib');
 
 (async () => {
   const ctx = mifare();

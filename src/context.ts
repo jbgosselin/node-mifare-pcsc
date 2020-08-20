@@ -1,23 +1,26 @@
-const { once, EventEmitter } = require('events');
-const pcsclite = require('pcsclite');
-const { log } = require('./common');
-const Reader = require('./reader');
+import { once, EventEmitter } from 'events';
+import pcsclite from 'pcsclite';
+import { log } from './common';
+import Reader from './reader';
+import Card from './card';
 
 class Context extends EventEmitter {
+  pcsc: PCSCLite;
+
   constructor() {
     super();
     this.pcsc = pcsclite();
 
-    this.pcsc.on('error', (err) => {
+    this.pcsc.on('error', (err: Error) => {
       log(`PCSC Error: ${err}`);
       this.emit('error', err);
     });
 
-    const onCard = (card) => {
+    const onCard = (card: Card) => {
       this.emit('card', card);
     };
 
-    this.pcsc.on('reader', (rawReader) => {
+    this.pcsc.on('reader', (rawReader: CardReader) => {
       const reader = new Reader(rawReader);
       this.emit('reader', reader);
       reader.on('card', onCard);
@@ -27,10 +30,10 @@ class Context extends EventEmitter {
     });
   }
 
-  async waitForCard() {
+  async waitForCard(): Promise<Card> {
     const [card] = await once(this, 'card');
     return card;
   }
 }
 
-module.exports = Context;
+export default Context;

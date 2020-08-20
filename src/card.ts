@@ -1,17 +1,20 @@
-const {
+import {
   byteFromTwoHex,
-  DEFAULT_END_ACS,
   KEY_TYPE_A,
   KEY_TYPE_B,
-} = require('./common');
+} from './common';
+import Reader from './reader';
 
-class Card {
-  constructor(reader, protocol) {
+export default class Card {
+  reader: Reader;
+  protocol: number;
+
+  constructor(reader: Reader, protocol: number) {
     this.reader = reader;
     this.protocol = protocol;
   }
 
-  static packACS(c1, c2, c3) {
+  static packACS({ c1, c2, c3, user }) {
     if (c1 < 0 || c1 > 0xF) throw new Error('C1 is out of range');
     if (c2 < 0 || c2 > 0xF) throw new Error('C2 is out of range');
     if (c3 < 0 || c3 > 0xF) throw new Error('C3 is out of range');
@@ -19,55 +22,57 @@ class Card {
       byteFromTwoHex(~c2, ~c1),
       byteFromTwoHex(c1, ~c3),
       byteFromTwoHex(c3, c2),
-      DEFAULT_END_ACS,
+      user,
     ]);
   }
 
-  static unpackACS(data) {
-    if (data.length !== 4) throw new Error('Buffer length is wrong');
+  static unpackACS(buff: Buffer) {
+    if (buff.length !== 4) throw new Error('Buffer length is wrong');
     return {
-      c1: (data[1] & 0xF0) >> 4,
-      c2: data[2] & 0xF,
-      c3: (data[2] & 0xF0) >> 4,
+      c1: (buff[1] & 0xF0) >> 4,
+      c2: buff[2] & 0xF,
+      c3: (buff[2] & 0xF0) >> 4,
+      user: buff[3],
     };
   }
 
-  static packTrailer(keya, keyb, c1, c2, c3) {
+  static packTrailer({ keya, keyb, acs }) {
     if (keya.length !== 6) throw new Error('KEY A length is wrong');
     if (keyb.length !== 6) throw new Error('KEY B length is wrong');
     return Buffer.concat([
       Buffer.from(keya),
-      Card.packACS(c1, c2, c3),
+      Card.packACS(acs),
       Buffer.from(keyb),
     ]);
   }
 
-  static unpackTrailer(data) {
-    if (data.length !== 16) throw new Error('Buffer length is wrong');
+  static unpackTrailer(block: Buffer) {
+    if (block.length !== 16) throw new Error('Buffer length is wrong');
     return {
-      keya: data.slice(0, 6),
-      acs: Card.unpackACS(data.slice(6, 10)),
-      keyb: data.slice(10, 16),
+      keya: block.slice(0, 6),
+      acs: Card.unpackACS(block.slice(6, 10)),
+      keyb: block.slice(10, 16),
     };
   }
 
-  async transmit(input, resLen = 0) {
+  async transmit(input: Buffer, resLen: number = 0) {
     const data = await this.reader.transmit(input, resLen + 2, this.protocol);
-    switch (data.slice(data.length - 2).toString('hex')) {
-      case '9000':
+    if (data.length < 2) throw new Error(`Undefined data: 0x${data.toString('hex')}`);
+    switch (data.readUInt16BE(data.length - 2)) {
+      case 0x9000:
         return data.slice(0, data.length - 2);
-      case '6300':
+      case 0x6300:
         throw new Error('Failed');
       default:
-        throw new Error(`Undefined data: ${data.toString('hex')}`);
+        throw new Error(`Undefined data: 0x${data.toString('hex')}`);
     }
   }
 
   getUID() {
-    return this.transmit(Buffer.from([0xFF, 0xCA, 0, 0, 0]), 0x10);
+    return this.transmit(Buffer.from([0xFF, 0xCA, 0, 0, 0]), 0x8);
   }
 
-  loadAuthKey(nb, key) {
+  loadAuthKey(nb: number, key: Buffer) {
     if (nb < 0 || nb > 0x20) throw new Error('Key Number is out of range');
     if (key.length !== 6) throw new Error('Key length should be 6');
     return this.transmit(Buffer.concat([
@@ -76,20 +81,20 @@ class Card {
     ]));
   }
 
-  authenticate(block, type, key) {
+  authenticate(block: number, type: number, key: number) {
     if (type !== KEY_TYPE_A && type !== KEY_TYPE_B) throw new Error('Wrong key type');
     if (block < 0 || block > 0x3F) throw new Error('Block out of range');
     if (key < 0 || key > 0x20) throw new Error('Key Number out of range');
     return this.transmit(Buffer.from([0xFF, 0x86, 0, 0, 5, 1, 0, block, type, key]));
   }
 
-  readBlock(block, length) {
+  readBlock(block: number, length: number) {
     if (block < 0 || block > 0x3F) throw new Error('Block out of range');
     if (length !== 0x10 && length !== 0x20 && length !== 0x30) throw new Error('Bad length');
     return this.transmit(Buffer.from([0xFF, 0xB0, 0, block, length]), length);
   }
 
-  updateBlock(block, data) {
+  updateBlock(block: number, data: Buffer) {
     if (block < 0 || block > 0x3F) throw new Error('Block out of range');
     if (data.length !== 0x10 && data.length !== 0x20 && data.length !== 0x30) {
       throw new Error('Bad length');
@@ -100,7 +105,7 @@ class Card {
     ]));
   }
 
-  restoreBlock(src, dest) {
+  restoreBlock(src: number, dest: number) {
     if (src < 0 || src > 0x3F) throw new Error('Source block out of range');
     if (dest < 0 || dest > 0x3F) throw new Error('Destination block out of range');
     if (((src / 4) | 0) !== ((dest / 4) | 0)) throw new Error('Blocks are not in the same sector');
@@ -111,5 +116,3 @@ class Card {
     return this.reader.disconnect(this.reader.reader.SCARD_LEAVE_CARD);
   }
 }
-
-module.exports = Card;

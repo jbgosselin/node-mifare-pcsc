@@ -1,4 +1,4 @@
-const byteFromTwoHex = (high, low) => ((high & 0xF) << 4) + (low & 0xF);
+const byteFromTwoHex = (high: number, low: number) => ((high & 0xF) << 4) + (low & 0xF);
 
 const KEY_TYPE_A = 0x60;
 const KEY_TYPE_B = 0x61;
@@ -23,12 +23,12 @@ const DEFAULT_END_ACS = 0x69;
 const log = (() => {
   if (process.env.MIFARE_DEBUG) {
     // eslint-disable-next-line no-console
-    return (...args) => console.log((new Date()).toISOString(), ...args);
+    return (...args: any[]) => console.log((new Date()).toISOString(), ...args);
   }
   return () => {};
 })();
 
-module.exports = {
+export {
   log,
   byteFromTwoHex,
   KEY_TYPE_A,

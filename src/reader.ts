@@ -1,10 +1,12 @@
-const EventEmitter = require('events');
+import { EventEmitter } from 'events';
 
-const { log } = require('./common');
-const Card = require('./card');
+import { log } from './common';
+import Card from './card';
 
 class Reader extends EventEmitter {
-  constructor(reader) {
+  reader: CardReader;
+
+  constructor(reader: CardReader) {
     super();
     this.reader = reader;
 
@@ -44,11 +46,11 @@ class Reader extends EventEmitter {
     });
   }
 
-  log(...args) {
+  log(...args: any[]) {
     log(`Reader(${this.reader.name})`, ...args);
   }
 
-  transmit(input, resLen, protocol) {
+  transmit(input: Buffer, resLen: number, protocol: number): Promise<Buffer> {
     return new Promise((resolve, reject) => {
       this.reader.transmit(input, resLen, protocol, (err, data) => {
         setImmediate(() => {
@@ -60,7 +62,7 @@ class Reader extends EventEmitter {
     });
   }
 
-  disconnect(disposition) {
+  disconnect(disposition: number) {
     return new Promise((resolve, reject) => {
       this.reader.disconnect(disposition, (err) => {
         setImmediate(() => {
@@ -71,7 +73,7 @@ class Reader extends EventEmitter {
     });
   }
 
-  connect(options) {
+  connect(options): Promise<number> {
     return new Promise((resolve, reject) => {
       this.reader.connect(options, (err, protocol) => {
         setImmediate(() => {
@@ -83,4 +85,4 @@ class Reader extends EventEmitter {
   }
 }
 
-module.exports = Reader;
+export default Reader;
